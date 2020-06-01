@@ -1,0 +1,29 @@
+## Same as drawdown code but this one uses function to keep it cleaner and easier
+## Input file etc are same as drawdown code
+
+# Writing the function
+def drawdown(return_series: pd.Series):
+    """
+    Takes a timeseries of asset returns
+    Computes and returns DataFrame that contains
+    Wealth Index
+    Previous Peaks
+    Percentage Drawdowns
+    """
+    wealth_index = 100 * (1+ return_series).cumprod()
+    previous_peaks = wealth_index.cummax()
+    draw = (wealth_index - previous_peaks)/ previous_peaks
+    return pd.DataFrame({
+        "Wealth": wealth_index,
+        "Peaks" : previous_peaks,
+        "Drawdowns": draw
+    })
+
+# Using the function
+drawdown(rets["Port5"]).head() ## Column name is from the input file that contains date and return (Port5) as %
+
+#Plotting
+drawdown(rets['Port5'])[["Wealth","Peaks"]].plot()
+
+# doing it from specific date say 2000 till end
+drawdown(rets["2000":]['Port5'])[["Wealth","Peaks"]].plot()
