@@ -1,0 +1,42 @@
+import pandas as pd
+## This input file contains the dates and returns in % so 2% should be 0.02 in the file
+rets = pd.read_excel("/Users/bijonpani/Documents/Input.xlsx", header = 0, index_col=0, parse_dates = True)
+rets.head()
+rets.plot.line()
+## Often you will need to run this line twice to get plot to work
+rets.plot.line()
+rets.columns = ["Port5"] # Giving return column a name change if needed
+## Check Index is in correct format datetime 64 bit
+rets.index
+#The returns are over a monthly period and not just timestamped at end of month
+## Cool way to assign it for the whole month
+
+rets.index = rets.index.to_period('M')
+
+## Compute Drawdown
+
+### 1. Compute wealth index
+### 2. Compute previous peaks
+### 3. Compute Drawdowns = wealth value as % of previous peaks
+
+## Growth of 100
+wealth_index = 100*(1+rets['Port5']).cumprod()
+wealth_index.plot.line()
+
+# Compute previous peaks. Go over time but keep track of max value
+previous_peaks = wealth_index.cummax()
+
+#This line never goes down as it tracks the max at any point in time
+previous_peaks.plot.line()
+
+#Drawdown in %
+drawdown = (wealth_index - previous_peaks)/ previous_peaks
+drawdown.plot()
+
+# How much was the biggest drawdown
+drawdown.min()
+
+# When did this happen i.e. index data of biggest drawdown
+drawdown.idxmin()
+
+
